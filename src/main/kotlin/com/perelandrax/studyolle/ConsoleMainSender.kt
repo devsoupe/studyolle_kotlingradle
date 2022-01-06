@@ -10,7 +10,6 @@ import javax.mail.internet.MimeMessage
 
 @Profile("local")
 @Component
-
 class ConsoleMainSender : JavaMailSender {
 
     override fun send(mimeMessage: MimeMessage) {
