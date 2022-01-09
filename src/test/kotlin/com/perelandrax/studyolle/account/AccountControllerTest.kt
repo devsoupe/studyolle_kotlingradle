@@ -1,6 +1,6 @@
 package com.perelandrax.studyolle.account
 
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.any
@@ -68,8 +68,9 @@ class AccountControllerTest {
             .andExpect(status().is3xxRedirection)
             .andExpect(view().name("redirect:/"))
 
-        assertTrue(accountRepository.existsByEmail("keesun@email.com"))
-
+        val account = accountRepository.findByEmail("keesun@email.com")
+        assertNotNull(account)
+        assertNotEquals(account.password, "12345678")
         then(javaMailSender).should().send(any(SimpleMailMessage::class.java))
     }
 }

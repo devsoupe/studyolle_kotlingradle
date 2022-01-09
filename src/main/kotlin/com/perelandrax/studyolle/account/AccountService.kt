@@ -3,12 +3,14 @@ package com.perelandrax.studyolle.account
 import com.perelandrax.studyolle.domain.Account
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class AccountService(
     val accountRepository: AccountRepository,
-    val javaMailSender: JavaMailSender
+    val javaMailSender: JavaMailSender,
+    val passwordEncoder: PasswordEncoder
 ) {
     fun proccessNewAccount(signUpForm: SignUpForm) {
         val newAccount = saveNewAccount(signUpForm)
@@ -19,8 +21,8 @@ class AccountService(
     private fun saveNewAccount(signUpForm: SignUpForm): Account {
         val account = Account(
             email = signUpForm.email,
-            nickname = signUpForm.nickname, // TODO encoding 해야함 (hash)
-            password = signUpForm.password,
+            nickname = signUpForm.nickname,
+            password = passwordEncoder.encode(signUpForm.password),
             studyCreatedByWeb = true,
             studyUpdatedByWeb = true
         )
