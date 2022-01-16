@@ -70,7 +70,8 @@ class AccountControllerTest {
 
         val account = accountRepository.findByEmail("keesun@email.com")
         assertNotNull(account)
-        assertNotEquals(account.password, "12345678")
+        assertNotEquals(account?.password, "12345678")
+        assertNotNull(account?.emailCheckToken)
         then(javaMailSender).should().send(any(SimpleMailMessage::class.java))
     }
 }

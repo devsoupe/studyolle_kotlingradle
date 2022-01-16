@@ -1,5 +1,6 @@
-package com.perelandrax.studyolle
+package com.perelandrax.studyolle.mail
 
+import com.perelandrax.studyolle.logger
 import org.springframework.context.annotation.Profile
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender

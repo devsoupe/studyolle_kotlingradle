@@ -5,6 +5,7 @@ import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AccountService(
@@ -12,6 +13,7 @@ class AccountService(
     val javaMailSender: JavaMailSender,
     val passwordEncoder: PasswordEncoder
 ) {
+    @Transactional
     fun proccessNewAccount(signUpForm: SignUpForm) {
         val newAccount = saveNewAccount(signUpForm)
         newAccount.generateEmailCheckToken()
@@ -34,7 +36,7 @@ class AccountService(
         val mailMessage = SimpleMailMessage().apply {
             setTo(newAccount.email)
             setSubject("스터이올래, 회원 가입 인증")
-            setText("/check-mail-token?token=$${newAccount.emailCheckToken}&email=${newAccount.email}")
+            setText("/check-email-token?token=${newAccount.emailCheckToken}&email=${newAccount.email}")
         }
 
         javaMailSender.send(mailMessage)
