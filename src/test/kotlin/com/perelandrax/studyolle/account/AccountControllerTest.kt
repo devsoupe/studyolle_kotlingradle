@@ -1,6 +1,8 @@
 package com.perelandrax.studyolle.account
 
-import org.junit.jupiter.api.Assertions.*
+import com.perelandrax.studyolle.domain.Account
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.any
@@ -17,7 +19,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.transaction.annotation.Transactional
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 class AccountControllerTest {
@@ -30,6 +34,43 @@ class AccountControllerTest {
 
     @MockBean
     private lateinit var javaMailSender: JavaMailSender
+
+    @DisplayName("인증 메일 확인 - 입력값 오류")
+    @Test
+    fun checkEmailToken_with_wrong_input() {
+        mockMvc.perform(
+            get("/check-email-token")
+                .param("token", "wrong_token")
+                .param("email", "email@email.com")
+        )
+            .andExpect(status().isOk)
+            .andExpect(model().attributeExists("error"))
+            .andExpect(view().name("account/checked-email"))
+    }
+
+    @DisplayName("인증 메일 확인 - 입력값 정상")
+    @Test
+    fun checkEmailToken() {
+        val account = Account(
+            email = "test@email.com",
+            password = "12345678",
+            nickname = "keesun"
+        )
+
+        val newAccount = accountRepository.save(account)
+        newAccount.generateEmailCheckToken()
+
+        mockMvc.perform(
+            get("/check-email-token")
+                .param("token", newAccount.emailCheckToken)
+                .param("email", newAccount.email)
+        )
+            .andExpect(status().isOk)
+            .andExpect(model().attributeDoesNotExist("error"))
+            .andExpect(model().attributeExists("nickname"))
+            .andExpect(model().attributeExists("numberOfUser"))
+            .andExpect(view().name("account/checked-email"))
+    }
 
     @DisplayName("회원 가입 화면 보이는지 테스트")
     @Test
@@ -74,4 +115,6 @@ class AccountControllerTest {
         assertNotNull(account?.emailCheckToken)
         then(javaMailSender).should().send(any(SimpleMailMessage::class.java))
     }
+
+
 }
