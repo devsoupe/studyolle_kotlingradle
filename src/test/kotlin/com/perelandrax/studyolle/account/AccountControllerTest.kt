@@ -14,6 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
+import org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated
+import org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -46,6 +48,7 @@ class AccountControllerTest {
             .andExpect(status().isOk)
             .andExpect(model().attributeExists("error"))
             .andExpect(view().name("account/checked-email"))
+            .andExpect(unauthenticated())
     }
 
     @DisplayName("인증 메일 확인 - 입력값 정상")
@@ -70,6 +73,7 @@ class AccountControllerTest {
             .andExpect(model().attributeExists("nickname"))
             .andExpect(model().attributeExists("numberOfUser"))
             .andExpect(view().name("account/checked-email"))
+            .andExpect(authenticated().withUsername("keesun"))
     }
 
     @DisplayName("회원 가입 화면 보이는지 테스트")
@@ -80,6 +84,7 @@ class AccountControllerTest {
             .andExpect(status().isOk)
             .andExpect(view().name("account/sign-up"))
             .andExpect(model().attributeExists("signUpForm"))
+            .andExpect(unauthenticated())
     }
 
     @DisplayName("회원 가입 처리 - 입력값 오류")
@@ -94,6 +99,7 @@ class AccountControllerTest {
         )
             .andExpect(status().isOk)
             .andExpect(view().name("account/sign-up"))
+            .andExpect(unauthenticated())
     }
 
     @DisplayName("회원 가입 처리 - 입력값 정상")
@@ -108,6 +114,7 @@ class AccountControllerTest {
         )
             .andExpect(status().is3xxRedirection)
             .andExpect(view().name("redirect:/"))
+            .andExpect(authenticated().withUsername("keesun"))
 
         val account = accountRepository.findByEmail("keesun@email.com")
         assertNotNull(account)

@@ -1,5 +1,6 @@
 package com.perelandrax.studyolle.account
 
+import com.perelandrax.studyolle.domain.Account
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.validation.Errors
@@ -36,7 +37,8 @@ class AccountController(
             return "account/sign-up"
         }
 
-        accountService.proccessNewAccount(signUpForm)
+        val account = accountService.proccessNewAccount(signUpForm)
+        accountService.login(account)
 
         return "redirect:/"
     }
@@ -51,17 +53,17 @@ class AccountController(
             return view
         }
 
-        if (account.emailCheckToken.equals(token).not()) {
+        if (!account.isValidToken(token)) {
             model.addAttribute("error", "wrong.email")
             return view
         }
 
         account.completeSignUp()
+        accountService.login(account)
 
         model.addAttribute("numberOfUser", accountRepository.count())
         model.addAttribute("nickname", account.nickname)
 
         return view
     }
-
 }

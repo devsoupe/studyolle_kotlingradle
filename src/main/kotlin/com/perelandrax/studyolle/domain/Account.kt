@@ -35,4 +35,8 @@ class Account(
         this.emailVerified = true
         this.joinedAt = LocalDateTime.now()
     }
+
+    fun isValidToken(token: String): Boolean {
+        return this.emailCheckToken.equals(token)
+    }
 }
